@@ -99,6 +99,11 @@ Dans l'app : « Désactiver le patch ». En SSH :
 
 Puis désinstalle l'app depuis le Homebrew Channel.
 
+## Développement
+
+Le code a été écrit avec l'aide de Claude (Anthropic). Il a été entièrement relu et
+testé par l'auteur, sur une vraie TV LG (webOS 10.3).
+
 ## Licence
 
 MIT, voir [LICENSE](LICENSE). Composants tiers : cJSON (`shim/vendor`, MIT),
