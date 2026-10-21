@@ -6,6 +6,12 @@ un clic ouvre la fiche dans l'app Jellyfin.
 
 **TV rootée requise** (Homebrew Channel). Testé sur webOS 10.3.
 
+![Accueil : le carrousel du haut avec une série Jellyfin](docs/accueil.jpg)
+
+| Bande-annonce lue dans le carrousel | Rangées Jellyfin |
+|---|---|
+| ![Bande-annonce](docs/bande-annonce.jpg) | ![Rangées](docs/rangees.jpg) |
+
 ## Ce que ça fait
 
 - **Carrousel du haut**, à la place des pubs LG :
