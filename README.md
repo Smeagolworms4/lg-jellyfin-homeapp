@@ -101,8 +101,9 @@ Puis désinstalle l'app depuis le Homebrew Channel.
 
 ## Développement
 
-Le code a été écrit avec l'aide de Claude (Anthropic). Il a été entièrement relu et
-testé par l'auteur, sur une vraie TV LG (webOS 10.3).
+Claude (Anthropic) a servi d'assistant pour l'implémentation et la documentation. Le
+mainteneur, développeur expérimenté, a dirigé le développement, relu le code généré, et
+testé l'application et ses fonctionnalités sur une TV LG (webOS 10.3) avant sa publication.
 
 ## Licence
 
