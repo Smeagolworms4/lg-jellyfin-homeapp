@@ -7,7 +7,7 @@
   var ROOT = "/media/developer/apps/usr/palm/applications/" + APP_ID + "/root";
   var CTL = ROOT + "/jellyhomectl.sh";
   var FEED = "python3 " + ROOT + "/jellyfeed.py";
-  var VERSION = "0.6.1";
+  var VERSION = "0.6.2";
 
   // Valeurs proposées par les sélecteurs (◀ ▶ ou OK pour faire défiler)
   var CHOICES = {

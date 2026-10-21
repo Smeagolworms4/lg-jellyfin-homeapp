@@ -19,6 +19,20 @@ cp -r app/. "$APPDIR/"
 find "$APPDIR" -name '__pycache__' -prune -exec rm -rf {} +
 chmod 755 "$APPDIR/root/"*.sh "$APPDIR/root/flutter-client" "$APPDIR/root/jellyfeed.py"
 
+# Comme ares-package : la description du paquet, que lisent les outils webosbrew
+TITLE=$(python3 -c 'import json;print(json.load(open("app/appinfo.json"))["title"])')
+mkdir -p "$W/data/usr/palm/packages/$ID"
+cat > "$W/data/usr/palm/packages/$ID/packageinfo.json" <<PKG
+{
+  "app": "$ID",
+  "id": "$ID",
+  "loc_name": "$TITLE",
+  "package_format_version": 2,
+  "vendor": "Smeagolworms4",
+  "version": "$VER"
+}
+PKG
+
 SIZE=$(du -sk "$W/data" | cut -f1)
 cat > "$W/control/control" <<CTRL
 Package: $ID
@@ -47,7 +61,7 @@ cat > "dist/$ID.manifest.json" <<MAN
   "version": "$VER",
   "type": "web",
   "title": "JellyHome",
-  "appDescription": "Ton Jellyfin sur l'accueil de la TV : bandeau et rangées avec tes covers, via Quick Connect. Root requis.",
+  "appDescription": "Your Jellyfin library on the webOS home screen: top carousel with artwork and trailers, rows, no LG ads. Root required.",
   "iconUri": "$REPO/raw/main/app/icon-large.png",
   "sourceUrl": "$REPO",
   "rootRequired": true,
