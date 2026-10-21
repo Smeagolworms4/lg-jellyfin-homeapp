@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920,height=1080,initial-scale=1">
+  <title>JellyHome</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="bg"></div>
+  <main class="layout">
+    <section class="side">
+      <img class="logo" src="icon-large.png" alt="">
+      <h1>JellyHome</h1>
+      <p class="tagline" data-i18n="tagline">Ton Jellyfin sur l'accueil de la TV</p>
+
+      <dl class="state">
+        <div><dt data-i18n="home">Accueil</dt><dd id="stHome">…</dd></div>
+        <div><dt data-i18n="feeder">Service Jellyfin</dt><dd id="stFeed">…</dd></div>
+        <div><dt data-i18n="server">Serveur</dt><dd id="stServer">—</dd></div>
+        <div><dt data-i18n="account">Compte</dt><dd id="stUser">—</dd></div>
+        <div><dt data-i18n="content">Contenu</dt><dd id="stCounts">—</dd></div>
+      </dl>
+      <p class="msg" id="msg"></p>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="serverTitle">Serveur Jellyfin</h2>
+      <div class="row">
+        <input id="server" class="focusable field" type="url" spellcheck="false"
+               placeholder="http://192.168.0.10:8096">
+        <button id="btnDiscover" class="focusable btn" data-i18n="discover">Rechercher</button>
+      </div>
+      <div class="row">
+        <button id="btnConnect" class="focusable btn primary" data-i18n="connect">Se connecter avec Quick Connect</button>
+        <button id="btnLogout" class="focusable btn ghost" data-i18n="logout">Déconnecter</button>
+      </div>
+
+      <h2 data-i18n="onHome">Sur l'accueil</h2>
+      <div class="toggles">
+        <button class="focusable toggle select wide" data-opt="topSource"><span data-i18n="topSource">Zone du haut</span><b></b></button>
+        <button class="focusable toggle wide" data-opt="adTrailers"><span data-i18n="adTrailers">Bandes-annonces dans la zone du haut</span><i></i></button>
+        <button class="focusable toggle wide" data-opt="topLgRow"><span data-i18n="topLgRow">Son contenu LG en rangée en dessous</span><i></i></button>
+        <button class="focusable toggle select wide" data-opt="heroSource"><span data-i18n="heroSource">Bandeau du haut</span><b></b></button>
+        <button class="focusable toggle select wide" data-opt="underRow"><span data-i18n="underRow">Rangée sous le bandeau</span><b></b></button>
+        <button class="focusable toggle select" data-opt="resume" data-row><span data-i18n="rowResume">Reprendre</span><b></b></button>
+        <button class="focusable toggle select" data-opt="nextUp" data-row><span data-i18n="rowNextUp">À suivre</span><b></b></button>
+        <button class="focusable toggle select" data-opt="latest" data-row><span data-i18n="rowLatest">Derniers ajouts</span><b></b></button>
+        <button class="focusable toggle" data-opt="progress"><span data-i18n="progress">Barre de progression</span><i></i></button>
+        <button class="focusable toggle" data-opt="hideAds"><span data-i18n="hideAds">Masquer les pubs LG</span><i></i></button>
+      </div>
+
+      <div class="row actions">
+        <button id="btnApply" class="focusable btn primary" data-i18n="apply">Appliquer à l'accueil</button>
+        <button id="btnRefresh" class="focusable btn" data-i18n="refresh">Actualiser</button>
+        <button id="btnPatch" class="focusable btn">Désactiver le patch</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="qc" class="modal" hidden>
+    <div class="sheet">
+      <h2>Quick Connect</h2>
+      <div class="qcbody">
+        <div id="qr" class="qr"></div>
+        <div>
+          <p data-i18n="qcStep1">Sur ton téléphone, ouvre Jellyfin (déjà connecté) :</p>
+          <p class="hint" data-i18n="qcStep2">Profil → Quick Connect, puis saisis le code</p>
+          <div id="qcCode" class="code">······</div>
+          <p class="hint" id="qcUrl"></p>
+          <p class="wait" id="qcWait">En attente de validation…</p>
+        </div>
+      </div>
+      <button id="btnQcCancel" class="focusable btn ghost" data-i18n="cancel">Annuler</button>
+    </div>
+  </div>
+
+  <script src="js/qrcode.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

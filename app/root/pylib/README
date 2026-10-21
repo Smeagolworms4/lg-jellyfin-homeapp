@@ -1,0 +1,2 @@
+Modules absents du Python de webOS, que yt-dlp importe (mis en PYTHONPATH pour lui seul).
+xml/ : copie de la bibliothèque standard CPython 3.8 (licence PSF).

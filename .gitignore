@@ -1,0 +1,7 @@
+# Journaux bruts de la TV (données personnelles)
+captures/
+# Produits de la construction (tools/package.sh)
+dist/
+app/root/libhomepatch.so
+__pycache__/
+*.pyc

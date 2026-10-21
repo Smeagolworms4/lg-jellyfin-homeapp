@@ -1,0 +1,30 @@
+#!/bin/sh
+# JellyHome — monté par-dessus /usr/bin/flutter-client (bind-mount, en RAM).
+#
+# Le hub luna attribue les droits selon le chemin de l'exécutable : le vrai
+# binaire doit tourner sous /usr/bin/flutter-client. On ouvre donc un espace de
+# montage propre au processus (esclave : il reçoit toujours les montages du
+# système), on y retire ce wrapper, et on exécute le vrai binaire à sa place.
+# Seul l'accueil reçoit libhomepatch ; les autres apps Flutter passent tel quel.
+ROOT=/media/developer/apps/usr/palm/applications/com.smeagolworms4.jellyhome/root
+DATA=/media/developer/jellyhome
+BIN=/usr/bin/flutter-client
+PRELOAD=
+case " $* " in
+  *" -i com.webos.app.home "*)
+    # Garde-fou : 3 lancements patchés en moins d'une minute = crash en boucle,
+    # on désactive le patch (jellyhomectl start le réarme).
+    now=$(date +%s); L=/tmp/jellyhome/launches
+    recent=$(awk -v n="$now" '$1 > n - 60' "$L" 2>/dev/null | wc -l)
+    [ "$recent" -ge 3 ] && : > "$DATA/disabled"
+    if [ ! -f "$DATA/disabled" ] && [ -f "$ROOT/libhomepatch.so" ]; then
+      mkdir -p /tmp/jellyhome; echo "$now" >> "$L"
+      PRELOAD="$ROOT/libhomepatch.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    fi ;;
+esac
+export HOMEPATCH_PRELOAD="$PRELOAD" HOMEPATCH_DIR="$DATA"
+exec unshare -m --propagation slave sh -c '
+  umount "$0" || exit 127
+  [ -n "$HOMEPATCH_PRELOAD" ] && export LD_PRELOAD="$HOMEPATCH_PRELOAD"
+  unset HOMEPATCH_PRELOAD
+  exec "$0" "$@"' "$BIN" "$@"

@@ -1,0 +1,14 @@
+{
+  "id": "com.smeagolworms4.jellyhome",
+  "version": "0.6.0",
+  "vendor": "Smeagolworms4",
+  "type": "web",
+  "main": "index.html",
+  "title": "JellyHome",
+  "appDescription": "Ton Jellyfin sur l'accueil de la TV (root)",
+  "icon": "icon.png",
+  "largeIcon": "icon-large.png",
+  "bgColor": "#0b0d14",
+  "iconColor": "#aa5cc3",
+  "disableBackHistoryAPI": true
+}
