@@ -33,8 +33,9 @@ webOS-Package-Format-Version: 2
 webOS-Packager-Version: x.y.x
 CTRL
 echo "2.0" > "$W/debian-binary"
-( cd "$W/control" && tar --owner=0 --group=0 -czf ../control.tar.gz ./control )
-( cd "$W/data" && tar --owner=0 --group=0 -czf ../data.tar.gz . )
+# Chemins sans « ./ » en tête : le dépôt webosbrew les cherche tels quels (control, usr/palm/…)
+( cd "$W/control" && tar --owner=0 --group=0 -czf ../control.tar.gz control )
+( cd "$W/data" && tar --owner=0 --group=0 -czf ../data.tar.gz usr )
 IPK="dist/${ID}_${VER}_all.ipk"
 rm -f "$IPK"
 ( cd "$W" && ar rc "$DIR/$IPK" debian-binary control.tar.gz data.tar.gz )
