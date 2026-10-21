@@ -92,3 +92,10 @@ Dans l'app : « Désactiver le patch ». En SSH :
 ```
 
 Puis désinstalle l'app depuis le Homebrew Channel.
+
+## Licence
+
+MIT, voir [LICENSE](LICENSE). Composants tiers : cJSON (`shim/vendor`, MIT),
+`app/root/pylib/xml` (CPython, licence PSF), police Noto Sans Bold pré-rendue
+(`app/root/font-*`, licence OFL). yt-dlp (Unlicense) est téléchargé par la TV, pas
+fourni.
