@@ -1,113 +1,126 @@
 # JellyHome
 
-Ton serveur Jellyfin sur l'écran d'accueil des TV LG webOS : le grand carrousel du
-haut, le bandeau et des rangées montrent tes films et séries, avec leurs visuels, et
-un clic ouvre la fiche dans l'app Jellyfin.
+**English** · [Français](README.fr.md)
 
-**TV rootée requise** (Homebrew Channel). Testé sur webOS 10.3.
+Your Jellyfin server on the home screen of LG webOS TVs: the big top carousel, the
+banner and rows show your movies and series with their artwork, and selecting one opens
+it in the Jellyfin app.
 
-![Accueil : le carrousel du haut avec une série Jellyfin](docs/accueil.jpg)
+**Rooted TV required** (Homebrew Channel). Tested on webOS 10.3.
 
-| Bande-annonce lue dans le carrousel | Rangées Jellyfin |
+![Home screen: the top carousel with a Jellyfin series](docs/accueil.jpg)
+
+| Trailer playing in the carousel | Jellyfin rows |
 |---|---|
-| ![Bande-annonce](docs/bande-annonce.jpg) | ![Rangées](docs/rangees.jpg) |
+| ![Trailer](docs/bande-annonce.jpg) | ![Rows](docs/rangees.jpg) |
 
-## Ce que ça fait
+## Features
 
-- **Carrousel du haut**, à la place des pubs LG :
-  - le contenu choisi dans « Zone du haut » (reprendre, à suivre, derniers ajouts,
-    favoris, à découvrir…) ;
-  - chaque élément a son visuel composé sur la TV : l'affiche à gauche, l'image de
-    fond à droite, et le logo du titre en haut à droite (à défaut, son nom en gros) ;
-  - **bandes-annonces** : celles de Jellyfin, sinon les liens YouTube de ses
-    métadonnées. Elles sont téléchargées à l'avance (480p, sinon 720p, sinon 1080p)
-    et lues par-dessus l'affiche. L'accueil met le son quand on est dessus.
-- **Bandeau** à côté des entrées récentes et **rangée** en dessous : une catégorie
-  Jellyfin, ou le contenu LG d'origine.
-- **Rangées** Reprendre, À suivre, Derniers ajouts, avec barre de progression.
-- **Pubs LG masquées** (au choix).
-- **Clic** sur un élément : l'app Jellyfin s'ouvre sur sa fiche.
+- **Top carousel**, in place of LG ads:
+  - shows what you pick under "Top area" (continue watching, next up, recently added,
+    favorites, discover…);
+  - each item gets artwork composed on the TV: the poster on the left, the backdrop on
+    the right, and the title logo in the top right corner (or the title in large type);
+  - **trailers**: the item's Jellyfin trailer, or else the YouTube links from its
+    metadata. They are downloaded in advance (480p, falling back to 720p, then 1080p)
+    and played over the poster. The home screen turns the sound on when you are on it.
+- **Banner** next to recent inputs and a **row** below it: a Jellyfin category, or
+  LG's original content.
+- **Rows**: continue watching, next up, recently added, with a progress bar.
+- **LG ads hidden** (optional).
+- **Selecting** an item opens the Jellyfin app on its details page.
 
-Les réglages se font dans l'app JellyHome. La connexion au serveur passe par Quick
-Connect : aucun mot de passe à taper.
+Everything is set up in the JellyHome app. Signing in to the server uses Quick Connect:
+no password to type.
 
 ## Installation
 
-Installe l'IPK d'une release avec le Homebrew Channel. Ouvre JellyHome une fois : l'app pose le démarrage automatique et active le
-patch de l'accueil. Connecte-toi avec Quick Connect, puis « Appliquer à l'accueil ».
+Install the IPK from a release with the Homebrew Channel. Open JellyHome once: the app
+installs its boot hook and enables the home screen patch. Sign in with Quick Connect,
+then press "Apply to home screen".
 
-Depuis les sources, sur une TV rootée accessible en SSH (root, par clé) :
+From source, on a rooted TV reachable over SSH (root, with a key):
 
 ```sh
-sh tools/package.sh          # construit dist/<id>_<version>_all.ipk
-sh tools/install.sh [IP]     # l'installe sur la TV (défaut 192.168.0.221)
+sh tools/package.sh          # builds dist/<id>_<version>_all.ipk
+sh tools/install.sh [IP]     # installs it on the TV (default 192.168.0.221)
 ```
 
-`tools/build.sh` (lancé par `package.sh`) compile le shim pour la TV dans Docker
+`tools/build.sh` (run by `package.sh`) cross-compiles the shim for the TV in Docker
 (armv7, glibc 2.35).
 
-## Fonctionnement
+## How it works
 
-L'accueil webOS est une app Flutter compilée : on ne la modifie pas. On s'intercale
-entre elle et le bus luna.
+The webOS home screen is a compiled Flutter app: it is not modified. JellyHome sits
+between it and the luna bus.
 
-- **`shim/homepatch.c`** → `libhomepatch.so`, chargé dans l'accueil par
-  `LD_PRELOAD`. Il intercepte les appels luna et réécrit leurs réponses selon
-  `rules.json` : réponse remplacée, fusionnée ou retouchée champ par champ, relue à
-  chaud. Il peut aussi copier un appel sortant dans un fichier (clics). Sans règle
-  applicable, tout passe tel quel.
-- **`app/root/flutter-client`** est monté (bind-mount, en RAM) par-dessus
-  `/usr/bin/flutter-client`. Il ajoute le shim au seul lancement de l'accueil, avec un
-  garde-fou : trois plantages en une minute coupent le patch.
-- **`app/root/jellyfeed.py`**, le service, tourne sur la TV :
-  - il interroge Jellyfin et écrit les réponses toutes faites et `rules.json` ;
-  - il prépare en tâche de fond les visuels et les bandes-annonces du carrousel ;
-  - il les sert en HTTP sur `127.0.0.1:8097`, car l'accueil ne lit pas les fichiers
-    locaux ;
-  - il ouvre la fiche Jellyfin après un clic.
-- **`app/root/jellyhomectl.sh`** démarre et arrête le tout : installation, hook de
-  démarrage, relance de l'accueil.
-- **`app/`** contient l'app de réglages (HTML/JS). Elle passe ses commandes root par
-  le Homebrew Channel.
+- **`shim/homepatch.c`** → `libhomepatch.so`, loaded into the home screen with
+  `LD_PRELOAD`. It intercepts luna calls and rewrites their replies according to
+  `rules.json`: a reply can be replaced, merged or edited field by field, and the rules
+  are reloaded on the fly. It can also copy an outgoing call to a file (clicks). Without
+  a matching rule, everything goes through untouched.
+- **`app/root/flutter-client`** is bind-mounted (in RAM) over `/usr/bin/flutter-client`.
+  It adds the shim to the home screen only, with a guard: three crashes within a minute
+  turn the patch off.
+- **`app/root/jellyfeed.py`**, the service, runs on the TV:
+  - it queries Jellyfin and writes the ready-made replies and `rules.json`;
+  - it prepares the carousel artwork and trailers in the background;
+  - it serves them over HTTP on `127.0.0.1:8097`, because the home screen does not read
+    local files;
+  - it opens the Jellyfin details page after a click.
+- **`app/root/jellyhomectl.sh`** starts and stops everything: install, boot hook, home
+  screen restart.
+- **`app/`** is the settings app (HTML/JS). It runs its root commands through the
+  Homebrew Channel.
 
-Le carrousel du haut est l'emplacement pub `Portal/HomeBigCarousel@Main` du
-gestionnaire de pub. Une pub vidéo y est un couple d'actifs, la vidéo et une image
-pleine largeur, et la vidéo occupe les 46 % de gauche.
+The top carousel is the ad manager's `Portal/HomeBigCarousel@Main` slot. A video ad there
+is a pair of assets, the video and a full-width image, and the video covers the left 46%.
 
-La TV n'a ni Pillow ni ffmpeg, et son Python est amputé. Il faut donc tout faire en
-Python pur :
-- décodage et encodage PNG, et composition des visuels ;
-- texte dessiné à partir de glyphes pré-rendus : `tools/make-font.py`, Noto Sans Bold
-  (licence OFL), produit `app/root/font-*` ;
-- bandes-annonces YouTube récupérées par yt-dlp, téléchargé au premier besoin. yt-dlp
-  passe les vérifications de YouTube avec le Node.js de webOS. Les modules Python
-  manquants sont dans `app/root/pylib`, avec `xml` repris de CPython (licence PSF) ;
-- vidéo et son DASH réunis sans réencodage (`mux_fmp4`).
+The TV has neither Pillow nor ffmpeg, and its Python is stripped down, so everything is
+done in pure Python:
+- PNG decoding and encoding, and artwork composition;
+- text drawn from pre-rendered glyphs: `tools/make-font.py`, Noto Sans Bold (OFL
+  licence), produces `app/root/font-*`;
+- YouTube trailers fetched by yt-dlp, downloaded on first use. yt-dlp passes YouTube's
+  checks with the webOS Node.js. The missing Python modules are in `app/root/pylib`,
+  with `xml` taken from CPython (PSF licence);
+- DASH video and audio joined without re-encoding (`mux_fmp4`).
 
-Les données vivent dans `/media/developer/jellyhome` : `config.json` (session Jellyfin,
-lisible par root seulement), règles, réponses, cache du carrousel (`ad/`). L'interception
-tient en montages effacés à chaque redémarrage. Hors du hook de démarrage, rien n'est
-écrit dans le système.
+Data lives in `/media/developer/jellyhome`: `config.json` (Jellyfin session, readable by
+root only), rules, replies, carousel cache (`ad/`). The interception is made of mounts
+that are wiped on every reboot. Apart from the boot hook, nothing is written to the
+system.
 
-## Désinstaller
+## Uninstall
 
-Dans l'app : « Désactiver le patch ». En SSH :
+In the app: "Disable patch". Over SSH:
 
 ```sh
 /media/developer/apps/usr/palm/applications/com.smeagolworms4.jellyhome/root/jellyhomectl.sh uninstall
 ```
 
-Puis désinstalle l'app depuis le Homebrew Channel.
+Then uninstall the app from the Homebrew Channel.
 
-## Développement
+## Development
 
-Claude (Anthropic) a servi d'assistant pour l'implémentation et la documentation. Le
-mainteneur, développeur expérimenté, a dirigé le développement, relu le code généré, et
-testé l'application et ses fonctionnalités sur une TV LG (webOS 10.3) avant sa publication.
+Claude (Anthropic) was used as an assistant for the implementation and documentation. The
+maintainer is an experienced developer who led the development, reviewed the generated
+code, and tested the app and its features on an LG TV (webOS 10.3) before release.
+
+## Support
+
+JellyHome is by [SmeagolWorms4](https://github.com/Smeagolworms4). Issues belong
+[here](https://github.com/Smeagolworms4/lg-jellyfin-homeapp/issues), and you can talk
+about the project on [SmeagolWorms4's Discord](https://discord.gg/xMBc5SQ). If you like
+it, you can support it:
+
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-SmeagolWorms4-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/Smeagolworms4)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-smeagolworms4-ffdd00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/smeagolworms4)
+[![PayPal](https://img.shields.io/badge/PayPal-donate-003087?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?business=SURRPGEXF4YVU&no_recurring=0)
 
 ## Licence
 
-MIT, voir [LICENSE](LICENSE). Composants tiers : cJSON (`shim/vendor`, MIT),
-`app/root/pylib/xml` (CPython, licence PSF), police Noto Sans Bold pré-rendue
-(`app/root/font-*`, licence OFL). yt-dlp (Unlicense) est téléchargé par la TV, pas
-fourni.
+MIT, see [LICENSE](LICENSE). Third-party components: cJSON (`shim/vendor`, MIT),
+`app/root/pylib/xml` (CPython, PSF licence), pre-rendered Noto Sans Bold font
+(`app/root/font-*`, OFL licence). yt-dlp (Unlicense) is downloaded by the TV, not
+bundled.
